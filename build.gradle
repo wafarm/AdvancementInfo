@@ -1,7 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
-	id "com.modrinth.minotaur" version "2.+"
-	id "com.matthewprenger.cursegradle" version "1.4.0"
+	id 'fabric-loom' version '1.7-SNAPSHOT'
 }
 
 repositories {
@@ -19,16 +17,10 @@ repositories {
     }
 }
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 21
+targetCompatibility = 21
 
-ext.Versions = new Properties()
-Versions.load(file("Versionfiles/mcversion-1.20.4.properties").newReader())
-
-archivesBaseName = "advancementinfo"
-ext.projectVersion = "1.4"
-
-version = "${Versions['minecraft_version']}-fabric${Versions['fabric_versiononly']}-${project.projectVersion}"
+version = project.mod_version
 
 loom {
     accessWidenerPath = file("src/main/resources/advancementinfo.accesswidener")
@@ -43,14 +35,14 @@ processResources {
 }
 
 dependencies {
-    minecraft  "com.mojang:minecraft:${Versions['minecraft_version']}"
-    mappings   "net.fabricmc:yarn:${Versions['yarn_mappings']}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${Versions['loader_version']}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${Versions['fabric_version']}"
-    modApi("me.shedaniel.cloth:cloth-config-fabric:11.0.99") {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    modCompileOnly "com.terraformersmc:modmenu:${Versions['modmenu_version']}"
+    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 java {
@@ -59,25 +51,4 @@ java {
 
 jar {
     from "LICENSE"
-}
-
-modrinth {
-    projectId = 'advancementinfo'
-    versionName = project.archivesBaseName
-    uploadFile = remapJar
-}
-
-curseforge {
-    apiKey = System.getenv("CURSEFORGE_TOKEN") ?: "0"
-    project {
-        id = '403815'
-        releaseType = 'release'
-        addGameVersion("${Versions['minecraft_version']}")
-        addGameVersion("Java "+targetCompatibility)
-        addGameVersion("Fabric")
-        mainArtifact(remapJar)
-    }
-    options {
-        forgeGradleIntegration = false
-    }
 }
