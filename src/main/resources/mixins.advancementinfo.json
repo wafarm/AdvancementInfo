@@ -6,9 +6,6 @@
         "AdvancementScreenMixin", "AdvancementTabMixin", "AdvancementWidgetMixin",
         "AdvancementTabTypeMixin", "AdvancementDisplayMixin"
     ],
-    "client-commented-out": [
-        "AdvancementProgressMixin"
-    ],
     "injectors": {
         "defaultRequire": 1
     }

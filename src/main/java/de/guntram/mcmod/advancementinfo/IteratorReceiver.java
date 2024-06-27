@@ -10,5 +10,5 @@ package de.guntram.mcmod.advancementinfo;
  * @author gbl
  */
 public interface IteratorReceiver {
-    public void accept(int pos, int len);
+    void accept(int pos, int len);
 }

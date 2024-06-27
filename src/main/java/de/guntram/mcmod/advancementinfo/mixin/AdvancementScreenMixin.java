@@ -12,7 +12,6 @@ import de.guntram.mcmod.advancementinfo.IteratorReceiver;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementScreenAccessor;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementWidgetAccessor;
 import java.util.List;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.PlacedAdvancement;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,7 +21,6 @@ import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientAdvancementManager;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -39,9 +37,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(AdvancementsScreen.class)
 public abstract class AdvancementScreenMixin extends Screen implements AdvancementScreenAccessor {
-    
+
     public AdvancementScreenMixin() { super(null); }
-    
+
     private int scrollPos;
     private int currentInfoWidth = config.infoWidth.calculate(width);
     private TextFieldWidget search;
@@ -52,13 +50,13 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
 
     @ModifyConstant(method="render", constant=@Constant(intValue = 252), require=1)
     private int getRenderLeft(int orig) { return width - config.marginX*2; }
-    
+
     @ModifyConstant(method="render", constant=@Constant(intValue = 140), require=1)
     private int getRenderTop(int orig) { return height - config.marginY*2; }
 
     @ModifyConstant(method="mouseClicked", constant=@Constant(intValue = 252), require=1)
     private int getMouseLeft(int orig) { return width - config.marginX*2; }
-    
+
     @ModifyConstant(method="mouseClicked", constant=@Constant(intValue = 140), require=1)
     private int getMouseTop(int orig) { return height - config.marginY*2; }
 
@@ -78,7 +76,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         currentInfoWidth = config.infoWidth.calculate(width);
         this.search = new TextFieldWidget(textRenderer, width-config.marginX-currentInfoWidth+9, config.marginY+18, currentInfoWidth-18, 17, ScreenTexts.EMPTY);
     }
-    
+
     @Inject(method="render",
             at=@At(value="INVOKE",
                     target="Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V"))
@@ -89,9 +87,9 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
                 width-config.marginX-currentInfoWidth+4, config.marginY+4,
                 width-config.marginX-4, height-config.marginY-4, 0xffc0c0c0);
     }
-    
+
     @Inject(method="drawWindow",
-            at=@At(value="INVOKE", 
+            at=@At(value="INVOKE",
                     target="Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V"))
     public void renderFrames(DrawContext context, int x, int y, CallbackInfo ci) {
         int iw = currentInfoWidth;
@@ -162,7 +160,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             func.accept(i, size);
         }
     }
-    
+
     @Inject(method="drawWindow", at=@At("HEAD"))
     public void calculateLayout(DrawContext context, int x, int y, CallbackInfo ci) {
         currentInfoWidth = config.infoWidth.calculate(width);
@@ -180,7 +178,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             renderCriteria(context, AdvancementInfo.mouseOver);
         }
     }
-    
+
     @Inject(method="mouseClicked", at=@At("HEAD"), cancellable = true)
     public void rememberClickedWidget(double x, double y, int button, CallbackInfoReturnable<Boolean> cir) {
         if (search.mouseClicked(x, y, button)) {
@@ -204,12 +202,12 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             AdvancementInfo.cachedClickListLineCount = 0;
         }
     }
-    
+
     @Inject(method="onRootAdded", at=@At("HEAD"))
     public void debugRootAdded(PlacedAdvancement root, CallbackInfo ci) {
         // System.out.println("root added to screen; display="+root.getDisplay()+", id="+root.getId().toString());
     }
-    
+
     // @Inject(method="mouseScrolled", at=@At("HEAD"), cancellable = true)
     @Override
     public boolean mouseScrolled(double X, double Y, double xAmount, double yAmount /*, CallbackInfoReturnable cir */) {
@@ -238,7 +236,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             }
         }
     }
-    
+
     @Override
     public boolean charTyped(char chr, int keyCode) {
         if (search.isActive()) {
@@ -293,12 +291,12 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             }
         }
     }
-    
+
     @Override
     public ClientAdvancementManager getAdvancementHandler() {
         return advancementHandler;
     }
-    
+
     public AdvancementTab myGetTab(PlacedAdvancement advancement) {
         return getTab(advancement);
     }

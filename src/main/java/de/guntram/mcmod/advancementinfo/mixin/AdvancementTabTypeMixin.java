@@ -5,7 +5,6 @@
  */
 package de.guntram.mcmod.advancementinfo.mixin;
 
-
 import de.guntram.mcmod.advancementinfo.AdvancementInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.advancement.AdvancementTabType;

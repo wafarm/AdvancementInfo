@@ -1,8 +1,5 @@
 package de.guntram.mcmod.advancementinfo;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import de.guntram.mcmod.advancementinfo.accessors.AdvancementProgressAccessor;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementScreenAccessor;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementWidgetAccessor;
 
@@ -13,11 +10,9 @@ import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementDisplay;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlacedAdvancement;
-import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
@@ -46,9 +41,9 @@ public class AdvancementInfo implements ClientModInitializer
         List<AdvancementStep> result = new ArrayList<>();
         addStep(result, widget.getProgress(), widget.getProgress().getUnobtainedCriteria(), false);
         addStep(result, widget.getProgress(), widget.getProgress().getObtainedCriteria(), true);
-        return result;        
+        return result;
     }
-    
+
     private static void addStep(List<AdvancementStep> result, AdvancementProgress progress, Iterable<String> criteria, boolean obtained) {
         final String[] prefixes = new String[] { "item.minecraft", "block.minecraft", "entity.minecraft", "container", "effect.minecraft", "biome.minecraft" };
         // criteria is actually a List<> .. but play nice
@@ -113,7 +108,7 @@ public class AdvancementInfo implements ClientModInitializer
         ClientAdvancementManager advancementHandler = ((AdvancementScreenAccessor)screen).getAdvancementHandler();
         Collection<PlacedAdvancement> all = advancementHandler.getManager().getAdvancements();
         int lineCount = 0;
-        
+
         text = text.toLowerCase();
         for (PlacedAdvancement adv: all) {
             Identifier id = adv.getAdvancementEntry().id();

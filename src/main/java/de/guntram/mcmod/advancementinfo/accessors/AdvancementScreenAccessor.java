@@ -5,7 +5,6 @@
  */
 package de.guntram.mcmod.advancementinfo.accessors;
 
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.PlacedAdvancement;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.network.ClientAdvancementManager;
@@ -15,6 +14,6 @@ import net.minecraft.client.network.ClientAdvancementManager;
  * @author gbl
  */
 public interface AdvancementScreenAccessor {
-        public ClientAdvancementManager getAdvancementHandler();
-        public AdvancementTab myGetTab(PlacedAdvancement advancement);
+    ClientAdvancementManager getAdvancementHandler();
+    AdvancementTab myGetTab(PlacedAdvancement advancement);
 }

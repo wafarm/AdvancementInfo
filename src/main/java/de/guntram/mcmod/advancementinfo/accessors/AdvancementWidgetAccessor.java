@@ -12,5 +12,5 @@ import net.minecraft.advancement.AdvancementProgress;
  * @author gbl
  */
 public interface AdvancementWidgetAccessor {
-    public AdvancementProgress getProgress();
+    AdvancementProgress getProgress();
 }
