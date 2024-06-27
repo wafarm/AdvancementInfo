@@ -7,12 +7,6 @@
         "client": [ "de.guntram.mcmod.advancementinfo.AdvancementInfo" ],
         "modmenu": [ "de.guntram.mcmod.advancementinfo.ModMenuIntegration" ]
     },
-    "custom": {
-        "modupdater": {
-            "strategy": "json",
-            "url": "https://raw.githubusercontent.com/gbl/ModVersionInfo/master/AdvancementInfo.json"
-        }
-    },
     "mixins": [ "mixins.advancementinfo.json" ],
     "accessWidener": "advancementinfo.accesswidener",
     "depends": {
@@ -27,8 +21,8 @@
     "icon": "icon.png",
     "authors": [ "Giselbaer" ],
     "contact": {
-        "homepage": "https://www.curseforge.com/minecraft/mc-mods/advancementinfo",
-        "sources": "https://github.com/gbl/AdvancementInfo",
-        "issues": "https://github.com/gbl/AdvancementInfo/issues"
+        "homepage": "https://modrinth.com/mod/modern-advancementinfo",
+        "sources": "https://github.com/wafarm/AdvancementInfo",
+        "issues": "https://github.com/wafarm/AdvancementInfo/issues"
     }
 }
