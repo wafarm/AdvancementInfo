@@ -32,7 +32,7 @@ public class AdvancementWidgetMixin implements AdvancementWidgetAccessor {
     }
 
     @Override
-    public AdvancementProgress getProgress() {
+    public AdvancementProgress advancementInfo$getProgress() {
         return this.progress;
     }
 }

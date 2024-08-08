@@ -26,7 +26,6 @@ import java.util.*;
 
 public class AdvancementInfo implements ClientModInitializer {
     static final String MODID = "advancementinfo";
-    static final String VERSION = "@VERSION@";
     static final Logger LOGGER = LogManager.getLogger();
 
     static public AdvancementWidget mouseOver, mouseClicked;
@@ -37,8 +36,8 @@ public class AdvancementInfo implements ClientModInitializer {
 
     public static List<AdvancementStep> getSteps(AdvancementWidgetAccessor widget) {
         List<AdvancementStep> result = new ArrayList<>();
-        addStep(result, widget.getProgress(), widget.getProgress().getUnobtainedCriteria(), false);
-        addStep(result, widget.getProgress(), widget.getProgress().getObtainedCriteria(), true);
+        addStep(result, widget.advancementInfo$getProgress(), widget.advancementInfo$getProgress().getUnobtainedCriteria(), false);
+        addStep(result, widget.advancementInfo$getProgress(), widget.advancementInfo$getProgress().getObtainedCriteria(), true);
         return result;
     }
 
@@ -139,7 +138,7 @@ public class AdvancementInfo implements ClientModInitializer {
                     continue;
                 }
                 details.add(tab.getTitle().getString());
-                boolean done = ((AdvancementWidgetAccessor) (screen.getAdvancementWidget(adv))).getProgress().isDone();
+                boolean done = ((AdvancementWidgetAccessor) (screen.getAdvancementWidget(adv))).advancementInfo$getProgress().isDone();
                 result.add(new AdvancementStep(title, done, details));
                 lineCount += 3;
             }

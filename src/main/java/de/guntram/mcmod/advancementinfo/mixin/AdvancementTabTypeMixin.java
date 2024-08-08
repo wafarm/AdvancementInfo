@@ -20,11 +20,13 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 public class AdvancementTabTypeMixin {
     @ModifyConstant(method = "getTabX", constant = @Constant(intValue = 248), require = 1)
     public int getAdjustedTabX(int orig) {
+        //noinspection DataFlowIssue
         return MinecraftClient.getInstance().currentScreen.width - AdvancementInfo.config.marginX * 2 - 4;
     }
 
     @ModifyConstant(method = "getTabY", constant = @Constant(intValue = 136), require = 1)
     public int getAdjustedTabY(int orig) {
+        //noinspection DataFlowIssue
         return MinecraftClient.getInstance().currentScreen.height - AdvancementInfo.config.marginY * 2 - 4;
     }
 }
