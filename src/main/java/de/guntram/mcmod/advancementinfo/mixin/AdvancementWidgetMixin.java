@@ -17,18 +17,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- *
  * @author gbl
  */
 
 @Mixin(AdvancementWidget.class)
 public class AdvancementWidgetMixin implements AdvancementWidgetAccessor {
 
-    @Shadow private AdvancementProgress progress;
+    @Shadow
+    private AdvancementProgress progress;
 
-    @Inject(method="drawTooltip", at=@At("HEAD"))
+    @Inject(method = "drawTooltip", at = @At("HEAD"))
     public void rememberTooltip(DrawContext context, int originX, int originY, float alpha, int x, int y, CallbackInfo ci) {
-        AdvancementInfo.mouseOver = (AdvancementWidget)(Object)this;
+        AdvancementInfo.mouseOver = (AdvancementWidget) (Object) this;
     }
 
     @Override

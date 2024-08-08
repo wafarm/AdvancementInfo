@@ -2,9 +2,6 @@ package de.guntram.mcmod.advancementinfo;
 
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementScreenAccessor;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementWidgetAccessor;
-
-import java.util.*;
-
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
@@ -25,8 +22,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-public class AdvancementInfo implements ClientModInitializer
-{
+import java.util.*;
+
+public class AdvancementInfo implements ClientModInitializer {
     static final String MODID = "advancementinfo";
     static final String VERSION = "@VERSION@";
     static final Logger LOGGER = LogManager.getLogger();
@@ -45,35 +43,35 @@ public class AdvancementInfo implements ClientModInitializer
     }
 
     private static void addStep(List<AdvancementStep> result, AdvancementProgress progress, Iterable<String> criteria, boolean obtained) {
-        final String[] prefixes = new String[] { "item.minecraft", "block.minecraft", "entity.minecraft", "container", "effect.minecraft", "biome.minecraft" };
+        final String[] prefixes = new String[]{"item.minecraft", "block.minecraft", "entity.minecraft", "container", "effect.minecraft", "biome.minecraft"};
         // criteria is actually a List<> .. but play nice
         ArrayList<String> sorted = new ArrayList<>();
-        for (String s:criteria) {
+        for (String s : criteria) {
             sorted.add(s);
         }
         ArrayList<String> details = null;
         Collections.sort(sorted);
-        for (String s: sorted) {
+        for (String s : sorted) {
             String translation = null;
             String key = s;
             if (key.startsWith("minecraft:")) {
-                key=key.substring(10);
+                key = key.substring(10);
             }
             if (key.startsWith("armor_trimmed_minecraft:")) {
-                key=key.substring(24);
+                key = key.substring(24);
             }
             if (key.startsWith("textures/entity/")) {
                 String entityAppearance = key.substring(16);
                 int dotPos;
-                if ((dotPos = entityAppearance.indexOf("."))>0) {
+                if ((dotPos = entityAppearance.indexOf(".")) > 0) {
                     entityAppearance = entityAppearance.substring(0, dotPos);
                 }
-                translation =  entityAppearance;
+                translation = entityAppearance;
             }
             if (translation == null) {
-                for (String prefix: prefixes) {
-                    if (I18n.hasTranslation(prefix+"."+key)) {
-                        translation = I18n.translate(prefix+"."+key);
+                for (String prefix : prefixes) {
+                    if (I18n.hasTranslation(prefix + "." + key)) {
+                        translation = I18n.translate(prefix + "." + key);
                         break;
                     }
                 }
@@ -105,12 +103,12 @@ public class AdvancementInfo implements ClientModInitializer
 
     public static void setMatchingFrom(AdvancementsScreen screen, String text) {
         List<AdvancementStep> result = new ArrayList<>();
-        ClientAdvancementManager advancementHandler = ((AdvancementScreenAccessor)screen).getAdvancementHandler();
+        ClientAdvancementManager advancementHandler = ((AdvancementScreenAccessor) screen).advancementInfo$getAdvancementHandler();
         Collection<PlacedAdvancement> all = advancementHandler.getManager().getAdvancements();
         int lineCount = 0;
 
         text = text.toLowerCase();
-        for (PlacedAdvancement adv: all) {
+        for (PlacedAdvancement adv : all) {
             Identifier id = adv.getAdvancementEntry().id();
             if (id.getPath().startsWith("recipes/")) {
                 continue;
@@ -129,21 +127,21 @@ public class AdvancementInfo implements ClientModInitializer
                 continue;
             }
             String title = display.get().getTitle().getString();
-            String desc  = display.get().getDescription().getString();
+            String desc = display.get().getDescription().getString();
             LOGGER.debug("- {} {}: {} ", id, title, desc);
             if (title.toLowerCase().contains(text)
-            ||  desc.toLowerCase().contains(text)) {
+                || desc.toLowerCase().contains(text)) {
                 ArrayList<String> details = new ArrayList<>();
                 details.add(desc);
-                AdvancementTab tab = ((AdvancementScreenAccessor)screen).myGetTab(adv);
+                AdvancementTab tab = ((AdvancementScreenAccessor) screen).advancementInfo$myGetTab(adv);
                 if (tab == null) {
                     LOGGER.info("no tab found for advancement {} title {} description {}", id, title, desc);
                     continue;
                 }
                 details.add(tab.getTitle().getString());
-                boolean done = ((AdvancementWidgetAccessor)(screen.getAdvancementWidget(adv))).getProgress().isDone();
+                boolean done = ((AdvancementWidgetAccessor) (screen.getAdvancementWidget(adv))).getProgress().isDone();
                 result.add(new AdvancementStep(title, done, details));
-                lineCount+=3;
+                lineCount += 3;
             }
         }
         cachedClickList = result;

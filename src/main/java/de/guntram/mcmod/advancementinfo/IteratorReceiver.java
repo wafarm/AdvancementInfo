@@ -6,7 +6,6 @@
 package de.guntram.mcmod.advancementinfo;
 
 /**
- *
  * @author gbl
  */
 public interface IteratorReceiver {

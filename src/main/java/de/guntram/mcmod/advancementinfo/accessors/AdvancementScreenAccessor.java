@@ -10,10 +10,10 @@ import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.network.ClientAdvancementManager;
 
 /**
- *
  * @author gbl
  */
 public interface AdvancementScreenAccessor {
-    ClientAdvancementManager getAdvancementHandler();
-    AdvancementTab myGetTab(PlacedAdvancement advancement);
+    ClientAdvancementManager advancementInfo$getAdvancementHandler();
+
+    AdvancementTab advancementInfo$myGetTab(PlacedAdvancement advancement);
 }
