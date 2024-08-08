@@ -97,8 +97,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
 
     @Inject(method = "init", at = @At("RETURN"))
     private void initSearchField(CallbackInfo ci) {
-        currentInfoWidth = config.infoWidth.calculate(width);
-        this.search = new TextFieldWidget(textRenderer, width-config.marginX-currentInfoWidth+9, config.marginY+18, currentInfoWidth-18, 17, ScreenTexts.EMPTY);
+        this.search = new TextFieldWidget(textRenderer, 0, 0, ScreenTexts.EMPTY);
     }
 
     @Inject(method = "render",
@@ -189,6 +188,10 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     @Inject(method = "drawWindow", at = @At("HEAD"))
     public void calculateLayout(DrawContext context, int x, int y, CallbackInfo ci) {
         currentInfoWidth = config.infoWidth.calculate(width);
+        search.setX(width - config.marginX - currentInfoWidth + 9);
+        search.setY(config.marginY + 18);
+        search.setWidth(currentInfoWidth - 18);
+        search.setHeight(17);
     }
 
     @Inject(method = "drawWindow", at = @At("RETURN"))
