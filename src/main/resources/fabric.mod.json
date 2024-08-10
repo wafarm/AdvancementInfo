@@ -11,17 +11,16 @@
     "accessWidener": "advancementinfo.accesswidener",
     "depends": {
         "fabric-api": "*",
-        "cloth-config2": ">=10.0.96"
+        "cloth-config2": ">=15"
     },
     "recommends": {
-        "modmenu" : ">=2.0.0"
+        "modmenu" : ">=11"
     },
     "name": "AdvancementInfo",
     "description": "Make it easier to see which advancements you have and what's missing.",
     "icon": "icon.png",
     "authors": [ "Giselbaer" ],
     "contact": {
-        "homepage": "https://modrinth.com/mod/modern-advancementinfo",
         "sources": "https://github.com/wafarm/AdvancementInfo",
         "issues": "https://github.com/wafarm/AdvancementInfo/issues"
     }
