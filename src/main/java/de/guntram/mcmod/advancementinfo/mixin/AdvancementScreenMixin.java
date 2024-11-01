@@ -236,17 +236,19 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         // System.out.println("root added to screen; display="+root.getDisplay()+", id="+root.getId().toString());
     }
 
-    // @Inject(method="mouseScrolled", at=@At("HEAD"), cancellable = true)
-    @Override
-    public boolean mouseScrolled(double X, double Y, double xAmount, double yAmount /*, CallbackInfoReturnable cir */) {
+     @Inject(method="mouseScrolled", at=@At("HEAD"), cancellable = true)
+    public void mouseScrolled(double X, double Y, double xAmount, double yAmount , CallbackInfoReturnable<Boolean> cir) {
+        if (X < search.getX()) {
+            return;
+        }
+
         if (yAmount > 0 && scrollPos > 0) {
             scrollPos--;
         } else if (yAmount < 0 && AdvancementInfo.cachedClickList != null
             && scrollPos < AdvancementInfo.cachedClickListLineCount - ((height - 2 * config.marginY - 45) / textRenderer.fontHeight - 1)) {
             scrollPos++;
         }
-        // System.out.println("scrollpos is now "+scrollPos+", needed lines "+AdvancementInfo.cachedClickListLineCount+", shown "+((height-2*config.marginY-45)/textRenderer.fontHeight - 1));
-        return false;
+        cir.setReturnValue(false);
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
