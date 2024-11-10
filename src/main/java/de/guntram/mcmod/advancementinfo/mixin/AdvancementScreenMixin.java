@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientAdvancementManager;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.util.Identifier;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static de.guntram.mcmod.advancementinfo.AdvancementInfo.config;
 
@@ -90,8 +92,8 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         return height - config.marginY * 2 - 3 * 9;
     }
 
-    @Redirect(method = "drawWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V"))
-    public void disableDefaultDraw(DrawContext instance, Identifier texture, int x, int y, int u, int v, int width, int height) {
+    @Redirect(method = "drawWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
+    public void disableDefaultDraw(DrawContext instance, Function<Identifier, RenderLayer> renderLayers, Identifier sprite, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         // do nothing
     }
 
@@ -113,7 +115,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
 
     @Inject(method = "drawWindow",
         at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lnet/minecraft/util/Identifier;IIIIII)V"))
+            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
     public void renderFrames(DrawContext context, int x, int y, CallbackInfo ci) {
         int iw = currentInfoWidth;
 
@@ -138,19 +140,19 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         int rightQuadX = width - config.marginX - halfW - iw + clipXh;
         int bottomQuadY = height - config.marginY - halfH + clipYh;
 
-        context.drawTexture(WINDOW_TEXTURE, x, y, 0, 0, halfW - clipXl, halfH - clipYl);
-        context.drawTexture(WINDOW_TEXTURE, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl); // top right
-        context.drawTexture(WINDOW_TEXTURE, x, bottomQuadY, 0, halfH + clipYh, halfW - clipXl, halfH - clipYh); // bottom left
-        context.drawTexture(WINDOW_TEXTURE, rightQuadX, bottomQuadY, halfW + clipXh, halfH + clipYh, halfW - clipXh, halfH - clipYh); // bottom right
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, y, 0, 0, halfW - clipXl, halfH - clipYl, 256, 256);
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl, 256, 256); // top right
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, bottomQuadY, 0, halfH + clipYh, halfW - clipXl, halfH - clipYh, 256, 256); // bottom left
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, rightQuadX, bottomQuadY, halfW + clipXh, halfH + clipYh, halfW - clipXh, halfH - clipYh, 256, 256); // bottom right
 
         // draw borders
         iterate(x + halfW - clipXl, rightQuadX, 200, (pos, len) -> {
-            context.drawTexture(WINDOW_TEXTURE, pos, y, 15, 0, len, halfH); // top
-            context.drawTexture(WINDOW_TEXTURE, pos, bottomQuadY, 15, halfH + clipYh, len, halfH - clipYh); // bottom
+            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, pos, y, 15, 0, len, halfH, 256, 256); // top
+            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, pos, bottomQuadY, 15, halfH + clipYh, len, halfH - clipYh, 256, 256); // bottom
         });
         iterate(y + halfH - clipYl, bottomQuadY, 100, (pos, len) -> {
-            context.drawTexture(WINDOW_TEXTURE, x, pos, 0, 25, halfW, len); // left
-            context.drawTexture(WINDOW_TEXTURE, rightQuadX, pos, halfW + clipXh, 25, halfW - clipXh, len); // right
+            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, pos, 0, 25, halfW, len, 256, 256); // left
+            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, rightQuadX, pos, halfW + clipXh, 25, halfW - clipXh, len, 256, 256); // right
         });
 
         if (currentInfoWidth == 0) return;
@@ -158,16 +160,16 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         // draw info corners
         int infoWl = (int) (iw / 2.);
         int infoWh = (int) (iw / 2. + 0.5);
-        context.drawTexture(WINDOW_TEXTURE, width - config.marginX - iw, y, 0, 0, infoWh, halfH); //
-        context.drawTexture(WINDOW_TEXTURE, width - config.marginX - infoWl, y, screenW - infoWl, 0, infoWl, halfH);
-        context.drawTexture(WINDOW_TEXTURE, width - config.marginX - iw, bottomQuadY, 0, halfH, infoWh, halfH);
-        context.drawTexture(WINDOW_TEXTURE, width - config.marginX - infoWl, bottomQuadY, screenW - infoWl, halfH, infoWl, halfH);
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw, y, 0, 0, infoWh, halfH, 256, 256); //
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - infoWl, y, screenW - infoWl, 0, infoWl, halfH, 256, 256);
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw, bottomQuadY, 0, halfH, infoWh, halfH, 256, 256);
+        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - infoWl, bottomQuadY, screenW - infoWl, halfH, infoWl, halfH, 256, 256);
 
         // draw info borders
         // Note: If the info box is too wide there would be missing top & bottom borders
         iterate(halfH + config.marginY, bottomQuadY, 100, (pos, len) -> {
-            context.drawTexture(WINDOW_TEXTURE, width - config.marginX - iw, pos, 0, 25, iw / 2, len); // left
-            context.drawTexture(WINDOW_TEXTURE, width - config.marginX - iw / 2, pos, screenW - iw / 2, 25, iw / 2, len); // right
+            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw, pos, 0, 25, iw / 2, len, 256, 256); // left
+            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw / 2, pos, screenW - iw / 2, 25, iw / 2, len, 256, 256); // right
         });
     }
 
