@@ -5,12 +5,14 @@
  */
 package de.guntram.mcmod.advancementinfo.mixin;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import de.guntram.mcmod.advancementinfo.AdvancementInfo;
 import de.guntram.mcmod.advancementinfo.AdvancementStep;
 import de.guntram.mcmod.advancementinfo.IteratorReceiver;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementScreenAccessor;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementWidgetAccessor;
 import net.minecraft.advancement.PlacedAdvancement;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
@@ -18,7 +20,6 @@ import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.util.Identifier;
@@ -32,7 +33,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static de.guntram.mcmod.advancementinfo.AdvancementInfo.config;
 
@@ -92,8 +92,8 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         return height - config.marginY * 2 - 3 * 9;
     }
 
-    @Redirect(method = "drawWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
-    public void disableDefaultDraw(DrawContext instance, Function<Identifier, RenderLayer> renderLayers, Identifier sprite, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+    @Redirect(method = "drawWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
+    public void disableDefaultDraw(DrawContext instance, RenderPipeline pipeline, Identifier sprite, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         // do nothing
     }
 
@@ -103,19 +103,19 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     }
 
     @Inject(method = "render",
-        at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V"))
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V"))
     public void renderRightFrameBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         context
-            .fill(
-                width - config.marginX - currentInfoWidth + 4, config.marginY + 4,
-                width - config.marginX - 4, height - config.marginY - 4, 0xffc0c0c0);
+                .fill(
+                        width - config.marginX - currentInfoWidth + 4, config.marginY + 4,
+                        width - config.marginX - 4, height - config.marginY - 4, 0xffc0c0c0);
     }
 
     @Inject(method = "drawWindow",
-        at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
     public void renderFrames(DrawContext context, int x, int y, CallbackInfo ci) {
         int iw = currentInfoWidth;
 
@@ -140,19 +140,19 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         int rightQuadX = width - config.marginX - halfW - iw + clipXh;
         int bottomQuadY = height - config.marginY - halfH + clipYh;
 
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, y, 0, 0, halfW - clipXl, halfH - clipYl, 256, 256);
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl, 256, 256); // top right
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, bottomQuadY, 0, halfH + clipYh, halfW - clipXl, halfH - clipYh, 256, 256); // bottom left
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, rightQuadX, bottomQuadY, halfW + clipXh, halfH + clipYh, halfW - clipXh, halfH - clipYh, 256, 256); // bottom right
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, x, y, 0, 0, halfW - clipXl, halfH - clipYl, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, rightQuadX, y, halfW + clipXh, 0, halfW - clipXh, halfH - clipYl, 256, 256); // top right
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, x, bottomQuadY, 0, halfH + clipYh, halfW - clipXl, halfH - clipYh, 256, 256); // bottom left
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, rightQuadX, bottomQuadY, halfW + clipXh, halfH + clipYh, halfW - clipXh, halfH - clipYh, 256, 256); // bottom right
 
         // draw borders
         iterate(x + halfW - clipXl, rightQuadX, 200, (pos, len) -> {
-            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, pos, y, 15, 0, len, halfH, 256, 256); // top
-            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, pos, bottomQuadY, 15, halfH + clipYh, len, halfH - clipYh, 256, 256); // bottom
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, pos, y, 15, 0, len, halfH, 256, 256); // top
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, pos, bottomQuadY, 15, halfH + clipYh, len, halfH - clipYh, 256, 256); // bottom
         });
         iterate(y + halfH - clipYl, bottomQuadY, 100, (pos, len) -> {
-            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, x, pos, 0, 25, halfW, len, 256, 256); // left
-            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, rightQuadX, pos, halfW + clipXh, 25, halfW - clipXh, len, 256, 256); // right
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, x, pos, 0, 25, halfW, len, 256, 256); // left
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, rightQuadX, pos, halfW + clipXh, 25, halfW - clipXh, len, 256, 256); // right
         });
 
         if (currentInfoWidth == 0) return;
@@ -160,16 +160,16 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         // draw info corners
         int infoWl = (int) (iw / 2.);
         int infoWh = (int) (iw / 2. + 0.5);
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw, y, 0, 0, infoWh, halfH, 256, 256); //
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - infoWl, y, screenW - infoWl, 0, infoWl, halfH, 256, 256);
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw, bottomQuadY, 0, halfH, infoWh, halfH, 256, 256);
-        context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - infoWl, bottomQuadY, screenW - infoWl, halfH, infoWl, halfH, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, width - config.marginX - iw, y, 0, 0, infoWh, halfH, 256, 256); //
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, width - config.marginX - infoWl, y, screenW - infoWl, 0, infoWl, halfH, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, width - config.marginX - iw, bottomQuadY, 0, halfH, infoWh, halfH, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, width - config.marginX - infoWl, bottomQuadY, screenW - infoWl, halfH, infoWl, halfH, 256, 256);
 
         // draw info borders
         // Note: If the info box is too wide there would be missing top & bottom borders
         iterate(halfH + config.marginY, bottomQuadY, 100, (pos, len) -> {
-            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw, pos, 0, 25, iw / 2, len, 256, 256); // left
-            context.drawTexture(RenderLayer::getGuiTextured, WINDOW_TEXTURE, width - config.marginX - iw / 2, pos, screenW - iw / 2, 25, iw / 2, len, 256, 256); // right
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, width - config.marginX - iw, pos, 0, 25, iw / 2, len, 256, 256); // left
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, WINDOW_TEXTURE, width - config.marginX - iw / 2, pos, screenW - iw / 2, 25, iw / 2, len, 256, 256); // right
         });
     }
 
@@ -199,7 +199,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     @Inject(method = "drawWindow", at = @At("RETURN"))
     public void renderRightFrameTitle(DrawContext context, int x, int y, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
-        context.drawText(textRenderer, I18n.translate("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, y + 6, 4210752, false);
+        context.drawText(textRenderer, I18n.translate("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, y + 6, 0xFF404040, false);
         search.renderWidget(context, x, y, 0);
 
         if (AdvancementInfo.mouseClicked != null) {
@@ -238,7 +238,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         // System.out.println("root added to screen; display="+root.getDisplay()+", id="+root.getId().toString());
     }
 
-     @Inject(method="mouseScrolled", at=@At("HEAD"), cancellable = true)
+    @Inject(method="mouseScrolled", at=@At("HEAD"), cancellable = true)
     public void mouseScrolled(double X, double Y, double xAmount, double yAmount , CallbackInfoReturnable<Boolean> cir) {
         if (X < search.getX()) {
             return;
@@ -247,7 +247,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         if (yAmount > 0 && scrollPos > 0) {
             scrollPos--;
         } else if (yAmount < 0 && AdvancementInfo.cachedClickList != null
-            && scrollPos < AdvancementInfo.cachedClickListLineCount - ((height - 2 * config.marginY - 45) / textRenderer.fontHeight - 1)) {
+                && scrollPos < AdvancementInfo.cachedClickListLineCount - ((height - 2 * config.marginY - 45) / textRenderer.fontHeight - 1)) {
             scrollPos++;
         }
         cir.setReturnValue(false);
@@ -298,10 +298,10 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             }
             if (skip-- <= 0) {
                 context.drawText(textRenderer,
-                    textRenderer.trimToWidth(entry.getName() == null ? "???" : entry.getName(), currentInfoWidth - 24),
-                    width - config.marginX - currentInfoWidth + 12, y,
-                    entry.getObtained() ? AdvancementInfo.config.colorHave : AdvancementInfo.config.colorHaveNot,
-                    false);
+                        textRenderer.trimToWidth(entry.getName() == null ? "???" : entry.getName(), currentInfoWidth - 24),
+                        width - config.marginX - currentInfoWidth + 12, y,
+                        entry.getObtained() ? (0xFF000000 | (AdvancementInfo.config.colorHave & 0x00FFFFFF)) : (0xFF000000 | (AdvancementInfo.config.colorHaveNot & 0x00FFFFFF)),
+                        false);
                 y += textRenderer.fontHeight;
                 if (y > height - config.marginY - textRenderer.fontHeight * 2) {
                     return;
@@ -312,9 +312,9 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
                 for (String detail : entry.getDetails()) {
                     if (skip-- <= 0) {
                         context.drawText(textRenderer,
-                            textRenderer.trimToWidth(detail, currentInfoWidth - 34),
-                            width - config.marginX - currentInfoWidth + 22, y,
-                            0x000000, false);
+                                textRenderer.trimToWidth(detail, currentInfoWidth - 34),
+                                width - config.marginX - currentInfoWidth + 22, y,
+                                0xFF000000, false);
                         y += textRenderer.fontHeight;
                         if (y > height - config.marginY - textRenderer.fontHeight * 2) {
                             return;
