@@ -18,10 +18,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
 import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientAdvancementManager;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
@@ -45,6 +47,10 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     @Shadow
     @Final
     private static Identifier WINDOW_TEXTURE;
+    @Unique
+    private boolean showRawCriteria = false;
+    @Unique
+    private ButtonWidget rawToggle;
     @Unique
     private int scrollPos;
     @Unique
@@ -97,25 +103,31 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         // do nothing
     }
 
-    @Inject(method = "init", at = @At("RETURN"))
-    private void initSearchField(CallbackInfo ci) {
+    @Inject(method = "init", at = @At("HEAD"))
+    private void initWidgets(CallbackInfo ci) {
         this.search = new TextFieldWidget(textRenderer, 0, 0, ScreenTexts.EMPTY);
+        this.rawToggle = ButtonWidget.builder(Text.translatable("advancementinfo.infopane.rawToggle"), widget -> toggleRaw()).dimensions(0, 0, 40, 16).build();
+    }
+
+    @Unique
+    private void toggleRaw() {
+        this.showRawCriteria = !this.showRawCriteria;
     }
 
     @Inject(method = "render",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V"))
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V"))
     public void renderRightFrameBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         context
-                .fill(
-                        width - config.marginX - currentInfoWidth + 4, config.marginY + 4,
-                        width - config.marginX - 4, height - config.marginY - 4, 0xffc0c0c0);
+            .fill(
+                width - config.marginX - currentInfoWidth + 4, config.marginY + 4,
+                width - config.marginX - 4, height - config.marginY - 4, 0xffc0c0c0);
     }
 
     @Inject(method = "drawWindow",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
+        at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
     public void renderFrames(DrawContext context, int x, int y, CallbackInfo ci) {
         int iw = currentInfoWidth;
 
@@ -194,13 +206,20 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         search.setY(config.marginY + 18);
         search.setWidth(currentInfoWidth - 18);
         search.setHeight(17);
+        rawToggle.setPosition(width - config.marginX - 49, config.marginY + 1);
     }
 
     @Inject(method = "drawWindow", at = @At("RETURN"))
     public void renderRightFrameTitle(DrawContext context, int x, int y, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         context.drawText(textRenderer, I18n.translate("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, y + 6, 0xFF404040, false);
-        search.renderWidget(context, x, y, 0);
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    public void renderRightFrameWidgets(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (currentInfoWidth == 0) return;
+        search.renderWidget(context, mouseX, mouseY, deltaTicks);
+        rawToggle.render(context, mouseX, mouseY, deltaTicks);
 
         if (AdvancementInfo.mouseClicked != null) {
             renderCriteria(context, AdvancementInfo.mouseClicked);
@@ -218,6 +237,12 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         } else {
             search.setFocused(false);
         }
+
+        if (rawToggle.mouseClicked(x, y, button)) {
+            cir.setReturnValue(true);
+            cir.cancel();
+        }
+
         if (x >= width - config.marginX - currentInfoWidth) {
             // later: handle click on search results here
             return;
@@ -238,8 +263,8 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         // System.out.println("root added to screen; display="+root.getDisplay()+", id="+root.getId().toString());
     }
 
-    @Inject(method="mouseScrolled", at=@At("HEAD"), cancellable = true)
-    public void mouseScrolled(double X, double Y, double xAmount, double yAmount , CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
+    public void mouseScrolled(double X, double Y, double xAmount, double yAmount, CallbackInfoReturnable<Boolean> cir) {
         if (X < search.getX()) {
             return;
         }
@@ -247,7 +272,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         if (yAmount > 0 && scrollPos > 0) {
             scrollPos--;
         } else if (yAmount < 0 && AdvancementInfo.cachedClickList != null
-                && scrollPos < AdvancementInfo.cachedClickListLineCount - ((height - 2 * config.marginY - 45) / textRenderer.fontHeight - 1)) {
+            && scrollPos < AdvancementInfo.cachedClickListLineCount - ((height - 2 * config.marginY - 45) / textRenderer.fontHeight - 1)) {
             scrollPos++;
         }
         cir.setReturnValue(false);
@@ -293,15 +318,16 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             return;
         }
         for (AdvancementStep entry : list) {
-            if (entry.getName() == null) {
+            String text = showRawCriteria ? entry.getId() : entry.getName();
+            if (text == null) {
                 System.out.println("list entry has null name: " + entry);
             }
             if (skip-- <= 0) {
                 context.drawText(textRenderer,
-                        textRenderer.trimToWidth(entry.getName() == null ? "???" : entry.getName(), currentInfoWidth - 24),
-                        width - config.marginX - currentInfoWidth + 12, y,
-                        entry.getObtained() ? (0xFF000000 | (AdvancementInfo.config.colorHave & 0x00FFFFFF)) : (0xFF000000 | (AdvancementInfo.config.colorHaveNot & 0x00FFFFFF)),
-                        false);
+                    textRenderer.trimToWidth(text == null ? "???" : text, currentInfoWidth - 24),
+                    width - config.marginX - currentInfoWidth + 12, y,
+                    entry.getObtained() ? (0xFF000000 | (AdvancementInfo.config.colorHave & 0x00FFFFFF)) : (0xFF000000 | (AdvancementInfo.config.colorHaveNot & 0x00FFFFFF)),
+                    false);
                 y += textRenderer.fontHeight;
                 if (y > height - config.marginY - textRenderer.fontHeight * 2) {
                     return;
@@ -312,9 +338,9 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
                 for (String detail : entry.getDetails()) {
                     if (skip-- <= 0) {
                         context.drawText(textRenderer,
-                                textRenderer.trimToWidth(detail, currentInfoWidth - 34),
-                                width - config.marginX - currentInfoWidth + 22, y,
-                                0xFF000000, false);
+                            textRenderer.trimToWidth(detail, currentInfoWidth - 34),
+                            width - config.marginX - currentInfoWidth + 22, y,
+                            0xFF000000, false);
                         y += textRenderer.fontHeight;
                         if (y > height - config.marginY - textRenderer.fontHeight * 2) {
                             return;

@@ -96,7 +96,7 @@ public class AdvancementInfo implements ClientModInitializer {
             */
                 translation = key;
             }
-            result.add(new AdvancementStep(translation, obtained, details));
+            result.add(new AdvancementStep(key, translation, obtained, details));
         }
     }
 
@@ -139,7 +139,7 @@ public class AdvancementInfo implements ClientModInitializer {
                 }
                 details.add(tab.getTitle().getString());
                 boolean done = ((AdvancementWidgetAccessor) (screen.getAdvancementWidget(adv))).advancementInfo$getProgress().isDone();
-                result.add(new AdvancementStep(title, done, details));
+                result.add(new AdvancementStep(title, title, done, details));
                 lineCount += 3;
             }
         }

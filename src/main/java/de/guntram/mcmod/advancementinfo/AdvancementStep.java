@@ -13,11 +13,13 @@ public class AdvancementStep {
     // Strings, not Texts, we can save a few µs by using all Strings here
     // and not converting to and fro.
 
+    private final String id;
     private final String name;
     private final boolean obtained;
     private final List<String> details;
 
-    AdvancementStep(String name, boolean obtained, List<String> details) {
+    AdvancementStep(String id, String name, boolean obtained, List<String> details) {
+        this.id = id;
         this.name = name;
         this.obtained = obtained;
         this.details = details;
@@ -33,5 +35,9 @@ public class AdvancementStep {
 
     public List<String> getDetails() {
         return details;
+    }
+
+    public String getId() {
+        return id;
     }
 }

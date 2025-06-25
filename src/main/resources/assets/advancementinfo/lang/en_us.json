@@ -1,5 +1,6 @@
 {
     "advancementinfo.infopane": "Info",
+    "advancementinfo.infopane.rawToggle": "Raw",
     "text.autoconfig.advancementinfo.title": "AdvancementInfo Settings",
     "text.autoconfig.advancementinfo.option.colorHave": "Finished Requirement Color",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "Unfinished Requirement Color",
