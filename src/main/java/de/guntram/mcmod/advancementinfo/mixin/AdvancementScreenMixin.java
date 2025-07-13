@@ -215,7 +215,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         context.drawText(textRenderer, I18n.translate("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, y + 6, 0xFF404040, false);
     }
 
-    @Inject(method = "render", at = @At("RETURN"))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.AFTER))
     public void renderRightFrameWidgets(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         search.renderWidget(context, mouseX, mouseY, deltaTicks);
