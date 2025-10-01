@@ -13,6 +13,7 @@ import de.guntram.mcmod.advancementinfo.accessors.AdvancementScreenAccessor;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementWidgetAccessor;
 import net.minecraft.advancement.PlacedAdvancement;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.advancement.AdvancementTab;
@@ -20,6 +21,8 @@ import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ClientAdvancementManager;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.screen.ScreenTexts;
@@ -229,8 +232,8 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    public void rememberClickedWidget(double x, double y, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (search.mouseClicked(x, y, button)) {
+    public void rememberClickedWidget(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        if (search.mouseClicked(click, doubled)) {
             search.setFocused(true);
             cir.setReturnValue(true);
             cir.cancel();
@@ -238,12 +241,12 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             search.setFocused(false);
         }
 
-        if (rawToggle.mouseClicked(x, y, button)) {
+        if (rawToggle.mouseClicked(click, doubled)) {
             cir.setReturnValue(true);
             cir.cancel();
         }
 
-        if (x >= width - config.marginX - currentInfoWidth) {
+        if (click.x() >= width - config.marginX - currentInfoWidth) {
             // later: handle click on search results here
             return;
         }
@@ -279,15 +282,15 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    public void redirectKeysToSearch(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    public void redirectKeysToSearch(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         if (search.isActive()) {
-            if (keyCode == GLFW.GLFW_KEY_ENTER) {
+            if (input.getKeycode() == GLFW.GLFW_KEY_ENTER) {
                 AdvancementInfo.setMatchingFrom((AdvancementsScreen) (Object) this, search.getText());
             }
-            search.keyPressed(keyCode, scanCode, modifiers);
+            search.keyPressed(input);
             // Only let ESCAPE end the screen, we don't want the keybind ('L')
             // to terminate the screen when we're typing text
-            if (keyCode != GLFW.GLFW_KEY_ESCAPE) {
+            if (input.getKeycode() != GLFW.GLFW_KEY_ESCAPE) {
                 cir.setReturnValue(true);
                 cir.cancel();
             }
@@ -295,12 +298,13 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     }
 
     @Override
-    public boolean charTyped(char chr, int keyCode) {
+    public boolean charTyped(CharInput charInput) {
         if (search.isActive()) {
-            return search.charTyped(chr, keyCode);
+            return search.charTyped(charInput);
         }
         return false;
     }
+
 
     @Unique
     private void renderCriteria(DrawContext context, AdvancementWidget widget) {
