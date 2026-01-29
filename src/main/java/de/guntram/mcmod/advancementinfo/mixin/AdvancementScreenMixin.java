@@ -119,7 +119,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
 
     @Inject(method = "render",
         at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V"))
+            target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;IIII)V"))
     public void renderRightFrameBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         context
@@ -131,7 +131,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     @Inject(method = "drawWindow",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIII)V"))
-    public void renderFrames(DrawContext context, int x, int y, CallbackInfo ci) {
+    public void renderFrames(DrawContext context, int x, int y, int mouseX, int mouseY, CallbackInfo ci) {
         int iw = currentInfoWidth;
 
         int screenW = 252;
@@ -203,7 +203,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     }
 
     @Inject(method = "drawWindow", at = @At("HEAD"))
-    public void calculateLayout(DrawContext context, int x, int y, CallbackInfo ci) {
+    public void calculateLayout(DrawContext context, int x, int y, int mouseX, int mouseY, CallbackInfo ci) {
         currentInfoWidth = config.infoWidth.calculate(width);
         search.setX(width - config.marginX - currentInfoWidth + 9);
         search.setY(config.marginY + 18);
@@ -213,12 +213,12 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     }
 
     @Inject(method = "drawWindow", at = @At("RETURN"))
-    public void renderRightFrameTitle(DrawContext context, int x, int y, CallbackInfo ci) {
+    public void renderRightFrameTitle(DrawContext context, int x, int y, int mouseX, int mouseY, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         context.drawText(textRenderer, I18n.translate("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, y + 6, 0xFF404040, false);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/advancement/AdvancementsScreen;drawWindow(Lnet/minecraft/client/gui/DrawContext;IIII)V", shift = At.Shift.AFTER))
     public void renderRightFrameWidgets(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         search.renderWidget(context, mouseX, mouseY, deltaTicks);

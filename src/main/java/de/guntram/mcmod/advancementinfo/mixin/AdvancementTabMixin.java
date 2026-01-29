@@ -82,13 +82,23 @@ public class AdvancementTabMixin {
         return contentHeight / 2;
     }
 
-    @ModifyConstant(method = "move", constant = @Constant(intValue = 234), require = 2)
+    @ModifyConstant(method = "move", constant = @Constant(intValue = 234), require = 1)
     private int getMoveXCenter(int orig) {
         return contentWidth;
     }
 
-    @ModifyConstant(method = "move", constant = @Constant(intValue = 113), require = 2)
+    @ModifyConstant(method = "move", constant = @Constant(intValue = 113), require = 1)
     private int getMoveYCenter(int orig) {
+        return contentHeight;
+    }
+
+    @ModifyConstant(method = "canScrollHorizontally", constant = @Constant(intValue = 234), require = 1)
+    private int getScrollableWidth(int orig) {
+        return contentWidth;
+    }
+
+    @ModifyConstant(method = "canScrollVertically", constant = @Constant(intValue = 113), require = 1)
+    private int getScrollableHeight(int orig) {
         return contentHeight;
     }
 

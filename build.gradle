@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version '1.15-SNAPSHOT'
 }
 
 repositories {
@@ -17,8 +17,6 @@ repositories {
     }
 }
 
-sourceCompatibility = 21
-targetCompatibility = 21
 
 version = project.mod_version
 
