@@ -3,6 +3,8 @@
     "text.autoconfig.advancementinfo.title": "Налады AdvancementInfo",
     "text.autoconfig.advancementinfo.option.colorHave": "Выкананае патрабаванне: колер",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "Невыкананае патрабаванне: колер",
+    "text.autoconfig.advancementinfo.option.rawDefault": "Raw уключаны па змаўчанні",
+    "text.autoconfig.advancementinfo.option.infoFontScale": "Маштаб шрыфту інфармацыйнай панэлі",
     "text.autoconfig.advancementinfo.option.marginX": "Водступ па X",
     "text.autoconfig.advancementinfo.option.marginY": "Водступ па Y",
     "text.autoconfig.advancementinfo.option.infoWidth": "Шырыня поля с інфармацыяй",

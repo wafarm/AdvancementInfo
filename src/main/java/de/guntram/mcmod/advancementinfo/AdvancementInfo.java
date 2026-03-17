@@ -104,7 +104,6 @@ public class AdvancementInfo implements ClientModInitializer {
         List<AdvancementStep> result = new ArrayList<>();
         ClientAdvancementManager advancementHandler = ((AdvancementScreenAccessor) screen).advancementInfo$getAdvancementHandler();
         Collection<PlacedAdvancement> all = advancementHandler.getManager().getAdvancements();
-        int lineCount = 0;
 
         text = text.toLowerCase();
         for (PlacedAdvancement adv : all) {
@@ -140,12 +139,25 @@ public class AdvancementInfo implements ClientModInitializer {
                 details.add(tab.getTitle().getString());
                 boolean done = ((AdvancementWidgetAccessor) (screen.getAdvancementWidget(adv))).advancementInfo$getProgress().isDone();
                 result.add(new AdvancementStep(title, title, done, details));
-                lineCount += 3;
             }
         }
         cachedClickList = result;
-        cachedClickListLineCount = lineCount;
+        cachedClickListLineCount = getLineCount(result);
         mouseOver = null;
+    }
+
+    public static int getLineCount(List<AdvancementStep> list) {
+        if (list == null) {
+            return 0;
+        }
+        int result = 0;
+        for (AdvancementStep entry : list) {
+            result++;
+            if (entry.getDetails() != null) {
+                result += entry.getDetails().size();
+            }
+        }
+        return result;
     }
 
     @Override

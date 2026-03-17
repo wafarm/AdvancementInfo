@@ -12,6 +12,9 @@ public class ModConfig implements ConfigData {
     public int colorHave = 0x00aa00;
     @ConfigEntry.ColorPicker
     public int colorHaveNot = 0xaa0000;
+    public boolean rawDefault = false;
+    @ConfigEntry.BoundedDiscrete(min = 50, max = 200)
+    public int infoFontScale = 100;
     public int marginX = 30;
     public int marginY = 30;
 
@@ -25,6 +28,7 @@ public class ModConfig implements ConfigData {
     }
 
     public void validate() {
+        infoFontScale = Math.max(50, Math.min(infoFontScale, 200));
         infoWidth.min = Math.max(100, infoWidth.min);
         if (infoWidth.min > infoWidth.max) {
             infoWidth.max = infoWidth.min;

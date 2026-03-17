@@ -4,6 +4,8 @@
     "text.autoconfig.advancementinfo.title": "AdvancementInfo Settings",
     "text.autoconfig.advancementinfo.option.colorHave": "Finished Requirement Color",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "Unfinished Requirement Color",
+    "text.autoconfig.advancementinfo.option.rawDefault": "Raw Enabled By Default",
+    "text.autoconfig.advancementinfo.option.infoFontScale": "Info Pane Font Scale",
     "text.autoconfig.advancementinfo.option.marginX": "Margin X",
     "text.autoconfig.advancementinfo.option.marginY": "Margin Y",
     "text.autoconfig.advancementinfo.option.infoWidth": "Info Width",

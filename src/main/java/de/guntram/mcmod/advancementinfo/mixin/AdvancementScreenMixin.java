@@ -51,7 +51,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     @Final
     private static Identifier WINDOW_TEXTURE;
     @Unique
-    private boolean showRawCriteria = false;
+    private boolean showRawCriteria;
     @Unique
     private ButtonWidget rawToggle;
     @Unique
@@ -108,6 +108,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
 
     @Inject(method = "init", at = @At("HEAD"))
     private void initWidgets(CallbackInfo ci) {
+        this.showRawCriteria = config.rawDefault;
         this.search = new TextFieldWidget(textRenderer, 0, 0, ScreenTexts.EMPTY);
         this.rawToggle = ButtonWidget.builder(Text.translatable("advancementinfo.infopane.rawToggle"), widget -> toggleRaw()).dimensions(0, 0, 40, 16).build();
     }
@@ -115,6 +116,31 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
     @Unique
     private void toggleRaw() {
         this.showRawCriteria = !this.showRawCriteria;
+    }
+
+    @Unique
+    private float getInfoFontScale() {
+        return config.infoFontScale / 100f;
+    }
+
+    @Unique
+    private int getInfoLineHeight() {
+        return Math.max(1, Math.round(textRenderer.fontHeight * getInfoFontScale()));
+    }
+
+    @Unique
+    private int getInfoVisibleLineCount() {
+        return Math.max(1, (height - 2 * config.marginY - 45) / getInfoLineHeight() - 1);
+    }
+
+    @Unique
+    private void drawScaledInfoText(DrawContext context, String text, int maxWidth, int x, int y, int color) {
+        float scale = getInfoFontScale();
+        String trimmedText = textRenderer.trimToWidth(text == null ? "???" : text, Math.max(1, (int) Math.floor(maxWidth / scale)));
+        context.getMatrices().pushMatrix();
+        context.getMatrices().scale(scale, scale);
+        context.drawText(textRenderer, trimmedText, Math.round(x / scale), Math.round(y / scale), color, false);
+        context.getMatrices().popMatrix();
     }
 
     @Inject(method = "render",
@@ -254,7 +280,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         scrollPos = 0;
         if (AdvancementInfo.mouseClicked != null) {
             AdvancementInfo.cachedClickList = AdvancementInfo.getSteps((AdvancementWidgetAccessor) AdvancementInfo.mouseClicked);
-            AdvancementInfo.cachedClickListLineCount = AdvancementInfo.cachedClickList.size();
+            AdvancementInfo.cachedClickListLineCount = AdvancementInfo.getLineCount(AdvancementInfo.cachedClickList);
         } else {
             AdvancementInfo.cachedClickList = null;
             AdvancementInfo.cachedClickListLineCount = 0;
@@ -275,7 +301,7 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
         if (yAmount > 0 && scrollPos > 0) {
             scrollPos--;
         } else if (yAmount < 0 && AdvancementInfo.cachedClickList != null
-            && scrollPos < AdvancementInfo.cachedClickListLineCount - ((height - 2 * config.marginY - 45) / textRenderer.fontHeight - 1)) {
+            && scrollPos < AdvancementInfo.cachedClickListLineCount - getInfoVisibleLineCount()) {
             scrollPos++;
         }
         cir.setReturnValue(false);
@@ -327,13 +353,10 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
                 System.out.println("list entry has null name: " + entry);
             }
             if (skip-- <= 0) {
-                context.drawText(textRenderer,
-                    textRenderer.trimToWidth(text == null ? "???" : text, currentInfoWidth - 24),
-                    width - config.marginX - currentInfoWidth + 12, y,
-                    entry.getObtained() ? (0xFF000000 | (AdvancementInfo.config.colorHave & 0x00FFFFFF)) : (0xFF000000 | (AdvancementInfo.config.colorHaveNot & 0x00FFFFFF)),
-                    false);
-                y += textRenderer.fontHeight;
-                if (y > height - config.marginY - textRenderer.fontHeight * 2) {
+                drawScaledInfoText(context, text, currentInfoWidth - 24, width - config.marginX - currentInfoWidth + 12, y,
+                    entry.getObtained() ? (0xFF000000 | (AdvancementInfo.config.colorHave & 0x00FFFFFF)) : (0xFF000000 | (AdvancementInfo.config.colorHaveNot & 0x00FFFFFF)));
+                y += getInfoLineHeight();
+                if (y > height - config.marginY - getInfoLineHeight() * 2) {
                     return;
                 }
             }
@@ -341,12 +364,9 @@ public abstract class AdvancementScreenMixin extends Screen implements Advanceme
             if (entry.getDetails() != null) {
                 for (String detail : entry.getDetails()) {
                     if (skip-- <= 0) {
-                        context.drawText(textRenderer,
-                            textRenderer.trimToWidth(detail, currentInfoWidth - 34),
-                            width - config.marginX - currentInfoWidth + 22, y,
-                            0xFF000000, false);
-                        y += textRenderer.fontHeight;
-                        if (y > height - config.marginY - textRenderer.fontHeight * 2) {
+                        drawScaledInfoText(context, detail, currentInfoWidth - 34, width - config.marginX - currentInfoWidth + 22, y, 0xFF000000);
+                        y += getInfoLineHeight();
+                        if (y > height - config.marginY - getInfoLineHeight() * 2) {
                             return;
                         }
                     }

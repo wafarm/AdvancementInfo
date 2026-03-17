@@ -3,6 +3,8 @@
     "text.autoconfig.advancementinfo.title": "AdvancementInfo көйләүләре",
     "text.autoconfig.advancementinfo.option.colorHave": "Төгәлләнгән таләп төсе",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "Төгәлләнмәгән таләп төсе",
+    "text.autoconfig.advancementinfo.option.rawDefault": "Raw килеш кушылган",
+    "text.autoconfig.advancementinfo.option.infoFontScale": "Мәгълүмат панеле шрифт масштабы",
     "text.autoconfig.advancementinfo.option.marginX": "X кыры",
     "text.autoconfig.advancementinfo.option.marginY": "Y кыры",
     "text.autoconfig.advancementinfo.option.infoWidth": "Мәгълүмат киңлеге",

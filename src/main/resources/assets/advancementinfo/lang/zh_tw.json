@@ -3,6 +3,8 @@
     "text.autoconfig.advancementinfo.title": "AdvancementInfo 設定",
     "text.autoconfig.advancementinfo.option.colorHave": "完成的進度顏色",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "未完成的進度顏色",
+    "text.autoconfig.advancementinfo.option.rawDefault": "預設啟用原始名稱",
+    "text.autoconfig.advancementinfo.option.infoFontScale": "資訊面板字體縮放",
     "text.autoconfig.advancementinfo.option.marginX": "邊距 X",
     "text.autoconfig.advancementinfo.option.marginY": "邊距 Y",
     "text.autoconfig.advancementinfo.option.infoWidth": "信息寬度",

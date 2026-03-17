@@ -3,6 +3,8 @@
     "text.autoconfig.advancementinfo.title": "Configurações do AdvancementInfo",
     "text.autoconfig.advancementinfo.option.colorHave": "Cor de Requisitos Finalizados",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "Cor de Requisitos A Fazer",
+    "text.autoconfig.advancementinfo.option.rawDefault": "Raw ativado por padrao",
+    "text.autoconfig.advancementinfo.option.infoFontScale": "Escala da fonte da painel de info",
     "text.autoconfig.advancementinfo.option.marginX": "Margem X",
     "text.autoconfig.advancementinfo.option.marginY": "Margem Y",
     "text.autoconfig.advancementinfo.option.infoWidth": "Largura da Info.",

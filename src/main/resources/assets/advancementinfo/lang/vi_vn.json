@@ -3,6 +3,8 @@
     "text.autoconfig.advancementinfo.title": "Cài đặt AdvancementInfo",
     "text.autoconfig.advancementinfo.option.colorHave": "Màu yêu cầu đã hoàn thành",
     "text.autoconfig.advancementinfo.option.colorHaveNot": "Màu yêu cầu chưa hoàn thành",
+    "text.autoconfig.advancementinfo.option.rawDefault": "Bật Raw theo mặc định",
+    "text.autoconfig.advancementinfo.option.infoFontScale": "Ti le phong chu bang thong tin",
     "text.autoconfig.advancementinfo.option.marginX": "Lề X",
     "text.autoconfig.advancementinfo.option.marginY": "Lề Y",
     "text.autoconfig.advancementinfo.option.infoWidth": "Chiều rộng thông tin",

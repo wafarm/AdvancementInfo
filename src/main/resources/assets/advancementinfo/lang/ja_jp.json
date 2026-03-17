@@ -3,6 +3,8 @@
 	"text.autoconfig.advancementinfo.title": "AdvancementInfo 設定",
 	"text.autoconfig.advancementinfo.option.colorHave": "達成した条件の色",
 	"text.autoconfig.advancementinfo.option.colorHaveNot": "未達成の条件の色",
+	"text.autoconfig.advancementinfo.option.rawDefault": "Raw をデフォルトで有効化",
+	"text.autoconfig.advancementinfo.option.infoFontScale": "情報パネルのフォント倍率",
 	"text.autoconfig.advancementinfo.option.marginX": "X軸の余白",
 	"text.autoconfig.advancementinfo.option.marginY": "Y軸の余白",
 	"text.autoconfig.advancementinfo.option.infoWidth": "詳細表示の幅",
