@@ -7,16 +7,16 @@ import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.advancement.AdvancementDisplay;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.advancement.PlacedAdvancement;
-import net.minecraft.client.gui.screen.advancement.AdvancementTab;
-import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
-import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
-import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.AdvancementNode;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,8 +36,8 @@ public class AdvancementInfo implements ClientModInitializer {
 
     public static List<AdvancementStep> getSteps(AdvancementWidgetAccessor widget) {
         List<AdvancementStep> result = new ArrayList<>();
-        addStep(result, widget.advancementInfo$getProgress(), widget.advancementInfo$getProgress().getUnobtainedCriteria(), false);
-        addStep(result, widget.advancementInfo$getProgress(), widget.advancementInfo$getProgress().getObtainedCriteria(), true);
+        addStep(result, widget.advancementInfo$getProgress(), widget.advancementInfo$getProgress().getRemainingCriteria(), false);
+        addStep(result, widget.advancementInfo$getProgress(), widget.advancementInfo$getProgress().getCompletedCriteria(), true);
         return result;
     }
 
@@ -69,8 +69,8 @@ public class AdvancementInfo implements ClientModInitializer {
             }
             if (translation == null) {
                 for (String prefix : prefixes) {
-                    if (I18n.hasTranslation(prefix + "." + key)) {
-                        translation = I18n.translate(prefix + "." + key);
+                    if (I18n.exists(prefix + "." + key)) {
+                        translation = I18n.get(prefix + "." + key);
                         break;
                     }
                 }
@@ -102,26 +102,18 @@ public class AdvancementInfo implements ClientModInitializer {
 
     public static void setMatchingFrom(AdvancementsScreen screen, String text) {
         List<AdvancementStep> result = new ArrayList<>();
-        ClientAdvancementManager advancementHandler = ((AdvancementScreenAccessor) screen).advancementInfo$getAdvancementHandler();
-        Collection<PlacedAdvancement> all = advancementHandler.getManager().getAdvancements();
+        ClientAdvancements advancementHandler = ((AdvancementScreenAccessor) screen).advancementInfo$getAdvancementHandler();
+        Collection<AdvancementNode> all = advancementHandler.getTree().nodes();
 
         text = text.toLowerCase();
-        for (PlacedAdvancement adv : all) {
-            Identifier id = adv.getAdvancementEntry().id();
+        for (AdvancementNode adv : all) {
+            Identifier id = adv.holder().id();
             if (id.getPath().startsWith("recipes/")) {
                 continue;
             }
-            Optional<AdvancementDisplay> display = adv.getAdvancement().display();
+            Optional<DisplayInfo> display = adv.advancement().display();
             if (display.isEmpty()) {
                 LOGGER.debug("! {} Has no display", id);
-                continue;
-            }
-            if (display.get().getTitle() == null) {
-                LOGGER.debug("! {} Has no title", id);
-                continue;
-            }
-            if (display.get().getDescription() == null) {
-                LOGGER.debug("! {} Has no description", id);
                 continue;
             }
             String title = display.get().getTitle().getString();
@@ -137,8 +129,11 @@ public class AdvancementInfo implements ClientModInitializer {
                     continue;
                 }
                 details.add(tab.getTitle().getString());
-                boolean done = ((AdvancementWidgetAccessor) (screen.getAdvancementWidget(adv))).advancementInfo$getProgress().isDone();
-                result.add(new AdvancementStep(title, title, done, details));
+                var widget = (AdvancementWidgetAccessor) screen.getAdvancementWidget(adv);
+                if (widget != null) {
+                    boolean done = widget.advancementInfo$getProgress().isDone();
+                    result.add(new AdvancementStep(title, title, done, details));
+                }
             }
         }
         cachedClickList = result;
@@ -168,7 +163,7 @@ public class AdvancementInfo implements ClientModInitializer {
             ConfigHolder<ModConfig> configHolder = AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new);
             configHolder.registerSaveListener((holder, modConfig) -> {
                 modConfig.validate();
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             });
             config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
         } else {

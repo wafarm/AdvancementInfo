@@ -2,6 +2,7 @@
     "required": true,
     "package": "de.guntram.mcmod.advancementinfo.mixin",
     "minVersion": "0.6",
+	"compatibilityLevel": "JAVA_25",
     "client": [
         "AdvancementScreenMixin", "AdvancementTabMixin", "AdvancementWidgetMixin",
         "AdvancementTabTypeMixin", "AdvancementDisplayMixin"

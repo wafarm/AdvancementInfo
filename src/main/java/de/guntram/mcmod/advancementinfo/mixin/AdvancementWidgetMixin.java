@@ -7,9 +7,9 @@ package de.guntram.mcmod.advancementinfo.mixin;
 
 import de.guntram.mcmod.advancementinfo.AdvancementInfo;
 import de.guntram.mcmod.advancementinfo.accessors.AdvancementWidgetAccessor;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.advancement.AdvancementWidget;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,8 +26,8 @@ public class AdvancementWidgetMixin implements AdvancementWidgetAccessor {
     @Shadow
     private AdvancementProgress progress;
 
-    @Inject(method = "drawTooltip", at = @At("HEAD"))
-    public void rememberTooltip(DrawContext context, int originX, int originY, float alpha, int x, int y, CallbackInfo ci) {
+    @Inject(method = "extractHover", at = @At("HEAD"))
+    public void rememberTooltip(GuiGraphicsExtractor context, int originX, int originY, float alpha, int x, int y, CallbackInfo ci) {
         AdvancementInfo.mouseOver = (AdvancementWidget) (Object) this;
     }
 

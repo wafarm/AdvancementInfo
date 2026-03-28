@@ -5,7 +5,7 @@
  */
 package de.guntram.mcmod.advancementinfo.accessors;
 
-import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.advancements.AdvancementProgress;
 
 /**
  * @author gbl
