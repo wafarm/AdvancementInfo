@@ -1,7 +1,7 @@
 package de.guntram.mcmod.advancementinfo.mixin;
 
 import de.guntram.mcmod.advancementinfo.AdvancementInfo;
-import net.minecraft.advancement.AdvancementDisplay;
+import net.minecraft.advancements.DisplayInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
-@Mixin(AdvancementDisplay.class)
+@Mixin(DisplayInfo.class)
 public class AdvancementDisplayMixin {
 
     @Shadow
