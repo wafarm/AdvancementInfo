@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screens.advancements.AdvancementTab;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.Level;
@@ -68,9 +68,10 @@ public class AdvancementInfo implements ClientModInitializer {
                 translation = entityAppearance;
             }
             if (translation == null) {
+                var language = Language.getInstance();
                 for (String prefix : prefixes) {
-                    if (I18n.exists(prefix + "." + key)) {
-                        translation = I18n.get(prefix + "." + key);
+                    if (language.has(prefix + "." + key)) {
+                        translation = language.getOrDefault(prefix + "." + key);
                         break;
                     }
                 }

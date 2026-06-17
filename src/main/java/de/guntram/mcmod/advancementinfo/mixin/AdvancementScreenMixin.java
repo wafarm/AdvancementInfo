@@ -72,39 +72,51 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
     @Shadow
     protected abstract AdvancementTab getTab(AdvancementNode advancement);
 
-    @ModifyConstant(method = "extractRenderState", constant = @Constant(intValue = 252), require = 1)
-    private int getRenderLeft(int orig) {
-        return width - config.marginX * 2;
-    }
+    @Shadow
+    private int leftPos;
 
-    @ModifyConstant(method = "extractRenderState", constant = @Constant(intValue = 140), require = 1)
-    private int getRenderTop(int orig) {
-        return height - config.marginY * 2;
-    }
+    @Shadow
+    private int topPos;
 
-    @ModifyConstant(method = "mouseClicked", constant = @Constant(intValue = 252), require = 1)
+    @ModifyConstant(method = "mouseClicked", constant = @Constant(intValue = AdvancementsScreen.WINDOW_WIDTH), require = 1)
     private int getMouseLeft(int orig) {
         return width - config.marginX * 2;
     }
 
-    @ModifyConstant(method = "mouseClicked", constant = @Constant(intValue = 140), require = 1)
+    @ModifyConstant(method = "mouseClicked", constant = @Constant(intValue = AdvancementsScreen.WINDOW_HEIGHT), require = 1)
     private int getMouseTop(int orig) {
         return height - config.marginY * 2;
     }
 
-    @ModifyConstant(method = "extractInside", constant = @Constant(intValue = 234), require = 1)
+    @ModifyConstant(method = "extractInside", constant = @Constant(intValue = AdvancementsScreen.WINDOW_INSIDE_WIDTH), require = 1)
     private int getAdvTreeXSize(int orig) {
         return width - config.marginX * 2 - 2 * 9 - currentInfoWidth;
     }
 
-    @ModifyConstant(method = "extractInside", constant = @Constant(intValue = 113), require = 1)
+    @ModifyConstant(method = "extractInside", constant = @Constant(intValue = AdvancementsScreen.WINDOW_INSIDE_HEIGHT), require = 1)
     private int getAdvTreeYSize(int orig) {
         return height - config.marginY * 2 - 3 * 9;
+    }
+
+    @ModifyConstant(method = "extractInside", constant = @Constant(intValue = AdvancementsScreen.WINDOW_INSIDE_WIDTH/2), require = 1)
+    private int getAdvTreeHalfXSize(int orig) {
+        return getAdvTreeXSize(orig) / 2;
+    }
+
+    @ModifyConstant(method = "extractInside", constant = @Constant(intValue = AdvancementsScreen.WINDOW_INSIDE_HEIGHT/2), require = 1)
+    private int getAdvTreeHalfYSize(int orig) {
+        return getAdvTreeYSize(orig) / 2;
     }
 
     @Redirect(method = "extractWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"))
     public void disableDefaultDraw(GuiGraphicsExtractor instance, RenderPipeline renderPipeline, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         // do nothing
+    }
+
+    @Inject(method = "repositionElements", at = @At("TAIL"))
+    private void fixPositionFields(CallbackInfo ci) {
+        leftPos = config.marginX;
+        topPos = config.marginY;
     }
 
     @Inject(method = "init", at = @At("HEAD"))
@@ -146,7 +158,7 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
 
     @Inject(method = "extractRenderState",
         at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractWindow(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIII)V"))
+            target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractWindow(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V"))
     public void renderRightFrameBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         context
@@ -158,14 +170,18 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
     @Inject(method = "extractWindow",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"))
-    public void renderFrames(GuiGraphicsExtractor context, int x, int y, int mouseX, int mouseY, CallbackInfo ci) {
+    public void renderFrames(GuiGraphicsExtractor context, int mouseX, int mouseY, CallbackInfo ci) {
+        int x = this.leftPos;
+        int y = this.topPos;
+
         int iw = currentInfoWidth;
 
-        int screenW = 252;
-        int screenH = 140;
+        int screenW = AdvancementsScreen.WINDOW_WIDTH;
+        int screenH = AdvancementsScreen.WINDOW_HEIGHT;
+
         // actual size that will be available for the box
         int actualW = width - config.marginX - iw - x;
-        int actualH = width - config.marginY - y;
+        int actualH = height - config.marginY - y;
         int halfW = screenW / 2;
         int halfH = screenH / 2;
         // When the screen is less than the default size the corners overlap
@@ -230,7 +246,7 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
     }
 
     @Inject(method = "extractWindow", at = @At("HEAD"))
-    public void calculateLayout(GuiGraphicsExtractor context, int x, int y, int mouseX, int mouseY, CallbackInfo ci) {
+    public void calculateLayout(GuiGraphicsExtractor context, int mouseX, int mouseY, CallbackInfo ci) {
         currentInfoWidth = config.infoWidth.calculate(width);
         search.setX(width - config.marginX - currentInfoWidth + 9);
         search.setY(config.marginY + 18);
@@ -240,12 +256,12 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
     }
 
     @Inject(method = "extractWindow", at = @At("RETURN"))
-    public void renderRightFrameTitle(GuiGraphicsExtractor context, int x, int y, int mouseX, int mouseY, CallbackInfo ci) {
+    public void renderRightFrameTitle(GuiGraphicsExtractor context, int mouseX, int mouseY, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
-        context.text(font, I18n.get("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, y + 6, 0xFF404040, false);
+        context.text(font, I18n.get("advancementinfo.infopane"), width - config.marginX - currentInfoWidth + 8, this.topPos + 6, 0xFF404040, false);
     }
 
-    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractWindow(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIII)V", shift = At.Shift.AFTER))
+    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/advancements/AdvancementsScreen;extractWindow(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V", shift = At.Shift.AFTER))
     public void renderRightFrameWidgets(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (currentInfoWidth == 0) return;
         search.extractWidgetRenderState(context, mouseX, mouseY, deltaTicks);

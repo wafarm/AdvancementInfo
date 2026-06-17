@@ -60,12 +60,12 @@ public class AdvancementTabMixin {
     }
 
     // space of the whole internal advancements widget
-    @ModifyConstant(method = "extractContents", constant = @Constant(intValue = 234), require = 1)
+    @ModifyConstant(method = {"extractContents", "tick", "scroll", "canScrollHorizontally", "extractTooltips"}, constant = @Constant(intValue = AdvancementsScreen.WINDOW_INSIDE_WIDTH), require = 1)
     private int getAdvTreeXSize(int orig) {
         return contentWidth;
     }
 
-    @ModifyConstant(method = "extractContents", constant = @Constant(intValue = 113), require = 1)
+    @ModifyConstant(method = {"extractContents", "tick", "scroll", "canScrollVertically", "extractTooltips"}, constant = @Constant(intValue = AdvancementsScreen.WINDOW_INSIDE_HEIGHT), require = 1)
     private int getAdvTreeYSize(int orig) {
         return contentHeight;
     }
@@ -82,26 +82,6 @@ public class AdvancementTabMixin {
         return contentHeight / 2;
     }
 
-    @ModifyConstant(method = "scroll", constant = @Constant(intValue = 234), require = 1)
-    private int getMoveXCenter(int orig) {
-        return contentWidth;
-    }
-
-    @ModifyConstant(method = "scroll", constant = @Constant(intValue = 113), require = 1)
-    private int getMoveYCenter(int orig) {
-        return contentHeight;
-    }
-
-    @ModifyConstant(method = "canScrollHorizontally", constant = @Constant(intValue = 234), require = 1)
-    private int getScrollableWidth(int orig) {
-        return contentWidth;
-    }
-
-    @ModifyConstant(method = "canScrollVertically", constant = @Constant(intValue = 113), require = 1)
-    private int getScrollableHeight(int orig) {
-        return contentHeight;
-    }
-
     // need to repeat the texture inside the scrollable space more
 
     @ModifyConstant(method = "extractContents", constant = @Constant(intValue = 15), require = 1)
@@ -114,19 +94,8 @@ public class AdvancementTabMixin {
         return (screen.height - config.marginY * 2) / 16 + 1;
     }
 
-    // area that can show a tooltip
-    @ModifyConstant(method = "extractTooltips", constant = @Constant(intValue = 234), require = 2)
-    private int getTooltipXSize(int orig) {
-        return contentWidth;
-    }
-
-    @ModifyConstant(method = "extractTooltips", constant = @Constant(intValue = 113), require = 2)
-    private int getTooltipYSize(int orig) {
-        return contentHeight;
-    }
-
     @Inject(method = "extractTooltips", at = @At("HEAD"))
-    private void forgetMouseOver(GuiGraphicsExtractor context, int mouseX, int mouseY, int x, int y, CallbackInfo ci) {
+    private void forgetMouseOver(GuiGraphicsExtractor graphics, int xo, int yo, CallbackInfo ci) {
         AdvancementInfo.mouseOver = null;
     }
 }

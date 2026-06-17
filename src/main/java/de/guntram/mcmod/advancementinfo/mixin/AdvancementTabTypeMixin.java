@@ -21,12 +21,12 @@ public class AdvancementTabTypeMixin {
     @ModifyConstant(method = "getX", constant = @Constant(intValue = 248), require = 1)
     public int getAdjustedTabX(int orig) {
         //noinspection DataFlowIssue
-        return Minecraft.getInstance().screen.width - AdvancementInfo.config.marginX * 2 - 4;
+        return Minecraft.getInstance().gui.screen().width - AdvancementInfo.config.marginX * 2 - 4;
     }
 
     @ModifyConstant(method = "getY", constant = @Constant(intValue = 136), require = 1)
     public int getAdjustedTabY(int orig) {
         //noinspection DataFlowIssue
-        return Minecraft.getInstance().screen.height - AdvancementInfo.config.marginY * 2 - 4;
+        return Minecraft.getInstance().gui.screen().height - AdvancementInfo.config.marginY * 2 - 4;
     }
 }

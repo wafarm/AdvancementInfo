@@ -10,13 +10,13 @@
     "mixins": [ "mixins.advancementinfo.json" ],
     "accessWidener": "advancementinfo.classtweaker",
     "depends": {
-        "minecraft": ">=26.1",
+        "minecraft": ">=26.2",
         "java": ">=25",
         "fabric-api": "*",
         "cloth-config2": ">=26.1.154"
     },
     "recommends": {
-        "modmenu" : ">=18.0.0-alpha.8"
+        "modmenu" : ">=20.0.0-beta.2"
     },
     "name": "AdvancementInfo",
     "description": "Make it easier to see which advancements you have and what's missing.",
