@@ -27,7 +27,7 @@ public class AdvancementWidgetMixin implements AdvancementWidgetAccessor {
     private AdvancementProgress progress;
 
     @Inject(method = "extractHover", at = @At("HEAD"))
-    public void rememberTooltip(GuiGraphicsExtractor context, int originX, int originY, float alpha, int x, int y, CallbackInfo ci) {
+    public void rememberTooltip(GuiGraphicsExtractor graphics, int xo, int yo, float fade, int screenxo, int screenyo, int screenWidth, CallbackInfo ci) {
         AdvancementInfo.mouseOver = (AdvancementWidget) (Object) this;
     }
 

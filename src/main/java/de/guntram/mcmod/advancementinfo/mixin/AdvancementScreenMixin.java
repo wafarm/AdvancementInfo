@@ -5,7 +5,8 @@
  */
 package de.guntram.mcmod.advancementinfo.mixin;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import de.guntram.mcmod.advancementinfo.AdvancementInfo;
 import de.guntram.mcmod.advancementinfo.AdvancementStep;
 import de.guntram.mcmod.advancementinfo.IteratorReceiver;
@@ -29,7 +30,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.NonNull;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -108,7 +108,7 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
         return getAdvTreeYSize(orig) / 2;
     }
 
-    @Redirect(method = "extractWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"))
+    @Redirect(method = "extractWindow", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"))
     public void disableDefaultDraw(GuiGraphicsExtractor instance, RenderPipeline renderPipeline, Identifier texture, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
         // do nothing
     }
@@ -169,7 +169,7 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
 
     @Inject(method = "extractWindow",
         at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"))
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"))
     public void renderFrames(GuiGraphicsExtractor context, int mouseX, int mouseY, CallbackInfo ci) {
         int x = this.leftPos;
         int y = this.topPos;
@@ -304,11 +304,6 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
         }
     }
 
-    @Inject(method = "onAddAdvancementRoot", at = @At("HEAD"))
-    public void debugRootAdded(AdvancementNode root, CallbackInfo ci) {
-        // System.out.println("root added to screen; display="+root.getDisplay()+", id="+root.getId().toString());
-    }
-
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     public void mouseScrolled(double X, double Y, double xAmount, double yAmount, CallbackInfoReturnable<Boolean> cir) {
         if (X < search.getX()) {
@@ -327,13 +322,13 @@ public abstract class AdvancementScreenMixin extends Screen implements ClientAdv
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     public void redirectKeysToSearch(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
         if (search.canConsumeInput()) {
-            if (input.input() == GLFW.GLFW_KEY_ENTER) {
+            if (input.input() == InputConstants.KEY_RETURN) {
                 AdvancementInfo.setMatchingFrom((AdvancementsScreen) (Object) this, search.getValue());
             }
             search.keyPressed(input);
             // Only let ESCAPE end the screen, we don't want the keybind ('L')
             // to terminate the screen when we're typing text
-            if (input.input() != GLFW.GLFW_KEY_ESCAPE) {
+            if (input.input() != InputConstants.KEY_ESCAPE) {
                 cir.setReturnValue(true);
                 cir.cancel();
             }

@@ -104,7 +104,7 @@ public class AdvancementInfo implements ClientModInitializer {
     public static void setMatchingFrom(AdvancementsScreen screen, String text) {
         List<AdvancementStep> result = new ArrayList<>();
         ClientAdvancements advancementHandler = ((AdvancementScreenAccessor) screen).advancementInfo$getAdvancementHandler();
-        Collection<AdvancementNode> all = advancementHandler.getTree().nodes();
+        Collection<AdvancementNode> all = advancementHandler.tree().nodes();
 
         text = text.toLowerCase();
         for (AdvancementNode adv : all) {
@@ -117,8 +117,8 @@ public class AdvancementInfo implements ClientModInitializer {
                 LOGGER.debug("! {} Has no display", id);
                 continue;
             }
-            String title = display.get().getTitle().getString();
-            String desc = display.get().getDescription().getString();
+            String title = display.get().title().getString();
+            String desc = display.get().description().getString();
             LOGGER.debug("- {} {}: {} ", id, title, desc);
             if (title.toLowerCase().contains(text)
                 || desc.toLowerCase().contains(text)) {
